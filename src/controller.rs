@@ -1,10 +1,9 @@
-use gilrs::{Gilrs, Axis,GamepadId,Event};
-use crate::robo::{Rolling,MoterSpeed};
+use gilrs::{Gilrs, Axis,GamepadId,Event,EventType,Button};
+use crate::robo::{Rolling,MoterSpeed,Action};
 
 
 pub trait Controller {
-    fn get_left_crawler(&mut self) -> (Rolling,MoterSpeed);
-    fn get_right_crawler(&mut self) -> (Rolling,MoterSpeed);
+    fn next_event(&mut self) -> Action;
 }
 
 pub struct ProCon{
@@ -28,10 +27,7 @@ impl  ProCon {
             }
         })
     }
-    fn get_stick_y(&mut self, axis:Axis) -> (Rolling,MoterSpeed){
-        self.gilrs.next_event();
-        let gamepad = self.gilrs.gamepad(self.gamepad_id);
-        let state = gamepad.state().value(gamepad.axis_code(axis).unwrap());
+    fn get_stick_y(&mut self, state:f32) -> (Rolling,MoterSpeed){
         let rolling = if state > 0.0 {
             Rolling::Normal
         } else {
@@ -49,22 +45,26 @@ impl  ProCon {
     }
 }
 impl Controller for ProCon {
-    fn get_left_crawler(&mut self) -> (Rolling,MoterSpeed){
-        self.get_stick_y(Axis::LeftStickY)
-    }
-    fn get_right_crawler(&mut self) -> (Rolling,MoterSpeed){
-        self.get_stick_y(Axis::RightStickY)
+    fn next_event(&mut self) -> Action{
+        let ev = self.gilrs.next_event().unwrap(); 
+        if ev.id != self.gamepad_id {
+            return Action::None
+        }
+        match  ev {
+            Event{  event:EventType::AxisChanged(Axis::LeftStickY,val,_),..} => {
+                let (rolling,speed) = self.get_stick_y(val);
+                Action::MoveLeftCrawler(rolling,speed)
+            }
+            Event{  event:EventType::AxisChanged(Axis::RightStickY,val,_),..} => {
+                let (rolling,speed) = self.get_stick_y(val);
+                Action::MoveRightCrawler(rolling,speed)
+            }
+            Event{   event: EventType::ButtonPressed(Button::RightTrigger, _),..} => {
+                Action::ToggleEye
+            },
+            _ => Action::None,
+        }
     }
     
 }
 
-pub struct Keybord;
-impl Controller for Keybord{
-    fn get_left_crawler(&mut self) -> (Rolling,MoterSpeed){
-        (Rolling::Normal,MoterSpeed::Middle)
-    }
-    fn get_right_crawler(&mut self) -> (Rolling,MoterSpeed){
-        (Rolling::Normal,MoterSpeed::Middle)
-    }
-
-}

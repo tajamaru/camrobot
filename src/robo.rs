@@ -1,5 +1,6 @@
 use rppal::gpio::{Gpio,OutputPin,Result};
 use rppal::pwm::{Pwm,Channel,Polarity};
+use crate::controller::*;
 
 const GPIO_AI2: u8 = 24;
 const GPIO_AI1: u8 = 23;
@@ -97,18 +98,24 @@ impl Moter{
 
 #[derive(Debug)]
 pub struct Robo{
-    pub moter_right: Moter,
-    pub moter_left: Moter,
-    pub stby: OutputPin,
-    pub left_eye: OutputPin,
-    pub right_eye: OutputPin,
+     moter_right: Moter,
+     moter_left: Moter,
+     stby: OutputPin,
+     left_eye: OutputPin,
+     right_eye: OutputPin,
 }
 #[derive(Debug)]
 pub enum Rolling{
     Normal,
     Reverse,
 }
-
+#[derive(Debug)]
+pub enum Action{
+    MoveRightCrawler(Rolling,MoterSpeed),
+    MoveLeftCrawler(Rolling,MoterSpeed),
+    ToggleEye,
+    None
+}
 impl Robo{
     pub fn new() -> Result<Self>{
         let moter_left = Moter::new(GPIO_AI1,GPIO_AI2,Channel::Pwm0).expect("moter_1 not work");
@@ -165,5 +172,17 @@ impl Robo{
     pub fn eye_toggle(&mut self){
         self.left_eye.toggle();
         self.right_eye.toggle();
+    }
+    pub fn  wakeup<T:Controller>(&mut self,  controller:&mut T){
+        self.ready();
+        loop{
+            match controller.next_event() {
+                Action::MoveLeftCrawler(rolling,speed) => self.move_left_crawler(rolling,speed),
+                Action::MoveRightCrawler(rolling,speed) => self.move_right_crawler(rolling,speed),
+                Action::ToggleEye => self.eye_toggle(),
+                Action::None => {},
+            }
+
+        }
     }
 }
