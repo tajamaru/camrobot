@@ -114,6 +114,7 @@ pub enum Action{
     MoveRightCrawler(Rolling,MoterSpeed),
     MoveLeftCrawler(Rolling,MoterSpeed),
     ToggleEye,
+    Stop,
     None
 }
 impl Robo{
@@ -147,6 +148,7 @@ impl Robo{
         }
         self.moter_left.stop();
         self.moter_right.stop();
+        self.eye_light_down();
     }
 
     pub fn move_left_crawler(&mut self, rolling:Rolling, speed:MoterSpeed) {
@@ -173,6 +175,10 @@ impl Robo{
         self.left_eye.toggle();
         self.right_eye.toggle();
     }
+    pub fn eye_light_down(&mut self){
+        self.left_eye.set_low();
+        self.right_eye.set_low();
+    }
     pub fn  wakeup<T:Controller>(&mut self,  controller:&mut T){
         self.ready();
         loop{
@@ -180,6 +186,10 @@ impl Robo{
                 Action::MoveLeftCrawler(rolling,speed) => self.move_left_crawler(rolling,speed),
                 Action::MoveRightCrawler(rolling,speed) => self.move_right_crawler(rolling,speed),
                 Action::ToggleEye => self.eye_toggle(),
+                Action::Stop => {
+                    self.stop();
+                    break;
+                }
                 Action::None => {},
             }
 
