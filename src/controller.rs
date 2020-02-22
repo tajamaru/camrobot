@@ -46,7 +46,7 @@ impl  ProCon {
 }
 impl Controller for ProCon {
     fn next_event(&mut self) -> Action{
-        let ev = self.gilrs.next_event().unwrap(); 
+        let ev = self.gilrs.next_event().expect("error next event!"); 
         if ev.id != self.gamepad_id {
             return Action::None
         }
