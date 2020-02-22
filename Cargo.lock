@@ -16,6 +16,14 @@ version = "3.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "camrobot"
+version = "0.1.0"
+dependencies = [
+ "gilrs 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rppal 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -292,14 +300,6 @@ dependencies = [
  "proc-macro2 1.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "unicode-xid 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "testgpio"
-version = "0.1.0"
-dependencies = [
- "gilrs 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "rppal 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

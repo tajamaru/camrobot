@@ -1,5 +1,5 @@
 [package]
-name = "testgpio"
+name = "camrobot"
 version = "0.1.0"
 authors = ["takamaru"]
 edition = "2018"

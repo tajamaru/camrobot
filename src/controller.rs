@@ -45,25 +45,27 @@ impl  ProCon {
     }
 }
 impl Controller for ProCon {
-    fn next_event(&mut self) -> Action{
-        let ev = self.gilrs.next_event().expect("error next event!"); 
-        if ev.id != self.gamepad_id {
-            return Action::None
-        }
-        match  ev {
-            Event{  event:EventType::AxisChanged(Axis::LeftStickY,val,_),..} => {
-                let (rolling,speed) = self.get_stick_y(val);
-                Action::MoveLeftCrawler(rolling,speed)
-            }
-            Event{  event:EventType::AxisChanged(Axis::RightStickY,val,_),..} => {
-                let (rolling,speed) = self.get_stick_y(val);
-                Action::MoveRightCrawler(rolling,speed)
-            }
-            Event{   event: EventType::ButtonPressed(Button::RightTrigger, _),..} => {
-                Action::ToggleEye
-            },
-            _ => Action::None,
-        }
+    fn next_event(&mut self) -> Action {
+        self.gilrs.next_event()
+                .map_or(Action::None, |ev|{
+                    if ev.id != self.gamepad_id {
+                        return Action::None
+                    }
+                    match  ev {
+                        Event{  event:EventType::AxisChanged(Axis::LeftStickY,val,_),..} => {
+                            let (rolling,speed) = self.get_stick_y(val);
+                            Action::MoveLeftCrawler(rolling,speed)
+                        }
+                        Event{  event:EventType::AxisChanged(Axis::RightStickY,val,_),..} => {
+                            let (rolling,speed) = self.get_stick_y(val);
+                            Action::MoveRightCrawler(rolling,speed)
+                        }
+                        Event{   event: EventType::ButtonPressed(Button::RightTrigger, _),..} => {
+                            Action::ToggleEye
+                        },
+                        _ => Action::None,
+                    }
+                })
     }
     
 }

@@ -183,7 +183,10 @@ impl Robo{
         self.ready();
         loop{
             match controller.next_event() {
-                Action::MoveLeftCrawler(rolling,speed) => self.move_left_crawler(rolling,speed),
+                Action::MoveLeftCrawler(rolling,speed) => {
+                    println!("{:?}",speed);
+                    self.move_left_crawler(rolling,speed)
+                },
                 Action::MoveRightCrawler(rolling,speed) => self.move_right_crawler(rolling,speed),
                 Action::ToggleEye => self.eye_toggle(),
                 Action::Stop => {
